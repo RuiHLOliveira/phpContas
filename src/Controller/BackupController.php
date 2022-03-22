@@ -21,7 +21,7 @@ class BackupController extends AbstractController
 
     private function sendMail($from, $to, $subject, $body, $attachments = []) {
 
-        $username = 'ruigx@hotmail.com';
+        $username = 'pipoca';
         $password = 'pipoca';
 
         $mail = new PHPMailer; //From email address and name
