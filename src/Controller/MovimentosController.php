@@ -24,7 +24,15 @@ class MovimentosController extends AbstractController
     {
         try {
             $filtros = [];
-            
+            $orderby['data'] = 'asc';
+
+            //PROCESSA ORDERBY
+            $data = $request->get('data');
+            if($data != null && ($data == 'asc' || $data == 'desc')) {
+                $orderby['data'] = $data;
+            }
+
+            //PROCESSA FILTRO IDCONTA
             $idConta = $request->get('idConta');
             if($idConta != null) {
                 $conta = $this->getDoctrine()->getRepository(Conta::class)->find($idConta);
@@ -34,7 +42,7 @@ class MovimentosController extends AbstractController
                 $filtros['conta'] = $conta;
             }
 
-            $movimentos = $this->getDoctrine()->getRepository(Movimento::class)->findBy($filtros,['data'=>'asc']);
+            $movimentos = $this->getDoctrine()->getRepository(Movimento::class)->findBy($filtros, $orderby);
 
             return new JsonResponse(compact('movimentos'),200);
 
