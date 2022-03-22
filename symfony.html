@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    code {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 1.1rem;
+        display: block;
+        white-space: pre;
+        background-color: #00000011;
+        padding: 5px 10px;
+        margin: 10px 0px;
+    }
+</style>
+
+<h3>Criando um projeto</h3>
+<code>symfony new projectname</code>
+
+<h3>Rodando o server</h3>
+<code>php -S localhost:8000 -t public</code>
+<code>symfony serve</code>
+
+<h2>Controllers</h2>
+
+<code>return new JsonResponse(['votes' => $mycount]);</code>
+<code>return this->JsonResponse</code>
+
+<h3>se quiser installar a anotation:</h3>
+<code>composer require annotations</code>
+<code>/**
+ * @Route("/") or @Route("/"m name="some_name")
+ */
+</code>
+
+<h3>Slugs:</h3>
+
+<code>/**
+* @Route("/questions/{slug}")
+*/
+public function show($slug)
+{
+
+}
+</code>
+
+<h3>that adds the `security:check` command</h3>
+<code>composer require sec-checker</code>
+
+
+<h3>Installing Twig</h3>
+<code>composer require twig</code>
+
+controller should extend `abstractController` to use `this->render`()
+
+<code>composer require profiler --dev</code>
+
+<h3>adds dump and dd commands</h3>
+
+(installs monolog too) adds log, and adds dump to symfony bar. you can use `php bin/console server:dump` too
+
+<code>composer require debug</code>
+
+<h3>if you need to unpack:</h3>
+<code>composer unpack symfony/debug-pack</code>
+
+<h3>assets</h3>
+<code>composer require symfony/asset</code>
+to use `asset()` twig function
+
+<h3>generating urls:</h3>
+
+<code>{{ path('url_controller_action', { slug : 'my-slug' } ) }}</code>
+
+twig <code>{{ parent() }}</code> for parent blocks
+
+<h3>to check all the services.</h3>
+
+<code>php bin/console debug:autowiring</code>
+
+<h3>Controller</h3>
+
+<code>php bin/console make:controller ProductController</code>
+
+<h3>Doctrine</h3>
+
+<code>composer require symfony/orm-pack</code>
+
+<code>composer require --dev symfony/maker-bundle</code>
+
+<code>php bin/console doctrine:database:create</code>
+
+<code>php bin/console make:entity</code>
+
+<code>php bin/console make:migration</code>
+
+<code>php bin/console doctrine:migrations:migrate</code>
+
+<code>
+php bin/console doctrine:database:drop --force && 
+php bin/console doctrine:database:create && 
+php bin/console doctrine:migrations:migrate
+</code>
+
+<h3>Inserting or Updating objects</h3>
+
+<code>
+// you can fetch the EntityManager via $this->getDoctrine()
+// or you can add an argument to the action: createProduct (EntityManagerInterface $entityManager)
+$entityManager = $this->getDoctrine()->getManager();
+
+$product = new Product();
+$product->setName('Keyboard');
+$product->setPrice(1999);
+$product->setDescription('Ergonomic and stylish!');
+
+// tell Doctrine you want to (eventually) save the Product (no queries yet)
+$entityManager->persist($product);
+
+// actually executes the queries (i.e. the INSERT query)
+$entityManager->flush();
+</code>
+
+<h3>Query via cli</h3>
+
+<code>php bin/console doctrine:query:sql 'SELECT * FROM product'</code>
+
+<h3>Validation</h3>
+
+<code>
+$product = new Product();
+// This will trigger an error: the column isn't nullable in the database
+$product->setName(null);
+// This will trigger a type mismatch error: an integer is expected
+$product->setPrice('1999');
+
+$errors = $validator->validate($product);
+if (count($errors) > 0) {
+    return new Response((string) $errors, 400);
+}
+</code>
+
+<h3>Fetching from database</h3>
+<code>
+$product = $this->getDoctrine()
+    ->getRepository(Product::class)
+    ->find($id);
+
+if (!$product) {
+    throw $this->createNotFoundException(
+        'No product found for id '.$id
+    );
+}
+
+return new Response('Check out this great product: '.$product->getName());
+</code>
+
+<h3>Querying from inside the Repository</h3>
+
+<code>
+// src/Repository/ProductRepository.php
+
+// ...
+public function findAllGreaterThanPrice($price): array
+{
+    $conn = $this->getEntityManager()->getConnection();
+
+    $sql = '
+        SELECT * FROM product p
+        WHERE p.price > :price
+        ORDER BY p.price ASC
+        ';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(['price' => $price]);
+
+    // returns an array of arrays (i.e. a raw data set)
+    return $stmt->fetchAll();
+}
+</code>
+
+<h2>Security</h2>
+
+<h3>Installing the bundle</h3>
+<code>composer require symfony/security-bundle</code>
+
+<h3>MakerBundle</h3>
+<code>composer require symfony/maker-bundle --dev</code>
+
+<h3>Creating User Class</h3>
+`php bin/console make:user`
+
+<h3>Updating the User Entity</h3>
+<code>php bin/console make:entity</code>
+
+<h3>Creating an user migration an migrating</h3>
+<code>php bin/console make:migration</code>
+<code>php bin/console make:migration:migrate</code>
+
+<h3>Creating Dummy Users</h3>
+
+<code>php bin/console make:fixtures</code>
+
+<h3>UserFixture</h3>
+
+<h3>extra</h3>
+
+<h3>cors bundle</h2>
+
+<code>https://github.com/nelmio/NelmioCorsBundle</code>
+
+<code>composer req cors</code>
+
+<h3>jwt</h3>
+
+<code>https://smoqadam.me/posts/how-to-authenticate-user-in-symfony-5-by-jwt/</code>
+
+<code>composer require firebase/php-jwt</code>
+
+</body>
+</html>
