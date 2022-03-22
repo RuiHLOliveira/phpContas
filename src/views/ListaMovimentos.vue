@@ -109,6 +109,7 @@ export default {
       novoMovimentoDescricao: '',
       novoMovimentoValor: '',
       novoMovimentoData: '',
+      buscarMovimentoOrdemDecrescente: true,
       movimentos: [],
       // noticeboxQueue: [],
       exibirModalEdicao: false,
@@ -161,6 +162,9 @@ export default {
     buscaMovimentos () {
       this.busy = true;
       let url = 'http://localhost:8000/movimentos?idConta='+this.idConta;
+      if(this.buscarMovimentoOrdemDecrescente == true) {
+        url += `&data=desc`
+      }
       let data = {
         method: 'get'
       };
