@@ -49,7 +49,7 @@
         <div>
             <div class="noticeBox" v-if="noticeboxQueue.length > 0">
                 <div v-for="notice in noticeboxQueue"
-                    :key="notice.message"
+                    :key="notice.id"
                     class="noticeBoxContainer" :class="{
                     'noticebox-error': notice.type == 'error',
                     'noticebox-success': notice.type == 'success'
@@ -74,7 +74,8 @@ export default {
         return {
             notice: '',
             noticeType: '',
-            noticeboxQueue: []
+            noticeboxQueue: [],
+            lastId: 0
         }
     },
     computed: {
@@ -85,12 +86,21 @@ export default {
         });
     },
     methods: {
+        getNextId() {
+            return this.lastId+1
+        },
         addNotice(message, type = 'success', time = null) {
             if (time == null) time = 3;
-            let newNotice = {message: message, type: type};
+            let newNotice = {id: this.getNextId(), message: message, type: type};
+            console.log('[LOG] id',newNotice.id);
             this.noticeboxQueue.push(newNotice);
+            this.lastId++;
             let timeout = setTimeout(() => {
                 this.noticeboxQueue.shift();
+                if(this.noticeboxQueue.length == 0) {
+                    this.lastId = 0;
+                    console.log('[LOG] Zerou!');
+                }
             }, time * 1000);
         }
     },
