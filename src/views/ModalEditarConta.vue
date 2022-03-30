@@ -1,27 +1,11 @@
 <style scoped>
-.modalBackground {
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-  top: 0;
-  left: 0;
-  background-color: #00000088;
-}
-
-.modal {
-  position: relative;
-  background-color: #ffffff;
-  margin: 0 auto;
-  margin-top: 20px;
-  max-width: 900px;
-}
 </style>
 
 <template>
   <div v-if="exibirModal">
     <div class="modalBackground">
-      <div class="modal">
-        <div class="flex-column alignitens-start pv5 ph10">
+      <div class="page">
+        <div class="whitebox flex-column alignitens-start">
           <div>
             <div class="pageTitle">Editar Conta</div>
           </div>

@@ -2,38 +2,40 @@
 </style>
 
 <template>
-  <div class="page">
+  <div>
+    <div class="page">
 
-    <div class="box">
-      <div class="pageTitle">Contas</div>
-    </div>
+      <div class="box">
+        <div class="pageTitle">Contas</div>
+      </div>
 
-    <div class="whitebox">
-      <div class="pageSubtitle">Criar Conta</div>
-      <input name="nome" class="form-input"
-        type="text" placeholder="nome" 
-        v-model="novaNotaNome">
-      <button class="btn" @click="criarconta()">Criar conta</button>
-    </div>
+      <div class="whitebox">
+        <div class="pageSubtitle">Criar Conta</div>
+        <input name="nome" class="form-input"
+          type="text" placeholder="nome" 
+          v-model="novaNotaNome">
+        <button class="btn" @click="criarconta()">Criar conta</button>
+      </div>
     
-    <div class="box">
-      <div class="pageSubtitle">Lista de Contas</div>
-      <div v-for="conta in contas" :key="conta.id" class="whitebox flex-column justify-spacebetween"><!-- flex justify-spacebetween alignitens-center">-->
-        <span class="mv5">
-          {{ conta.nome }}
-        </span>
-        <span class="mv5">
-          R$ {{ conta.saldo }}
-        </span>
-        <span class="mv5">
-          <router-link v-bind:to="'/listaMovimentos/'+conta.id" class="btn"><i class="fas fa-arrow-right"></i> Acessar</router-link>
-        </span>
-        <span class="mv5">
-          <button @click="ativarModalEdicao(conta.id)" class="btn"><i class="fas fa-edit"></i> editar</button>
+      <div class="box">
+        <div class="pageSubtitle">Lista de Contas</div>
+        <div v-for="conta in contas" :key="conta.id" class="whitebox flex-column justify-spacebetween"><!-- flex justify-spacebetween alignitens-center">-->
+          <span class="mv5">
+            {{ conta.nome }}
           </span>
-        <span class="mv5">
-          <button @click="ativarModalExcluirConta(conta.id)" class="btn"><i class="fas fa-trash"></i> excluir</button>
-        </span>
+          <span class="mv5">
+            R$ {{ conta.saldo }}
+          </span>
+          <span class="mv5">
+            <router-link v-bind:to="'/listaMovimentos/'+conta.id" class="btn"><i class="fas fa-arrow-right"></i> Acessar</router-link>
+          </span>
+          <span class="mv5">
+            <button @click="ativarModalEdicao(conta.id)" class="btn"><i class="fas fa-edit"></i> editar</button>
+            </span>
+          <span class="mv5">
+            <button @click="ativarModalExcluirConta(conta.id)" class="btn"><i class="fas fa-trash"></i> excluir</button>
+          </span>
+        </div>
       </div>
     </div>
 
