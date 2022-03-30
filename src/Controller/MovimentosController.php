@@ -97,6 +97,8 @@ class MovimentosController extends AbstractController
             $dataMovimento = new DateTime($requestData->data);
             $valorMovimento = str_replace(',','.',$requestData->valor);
 
+            $nomeLoja = $requestData->descricao !== null && $requestData->descricao !== '' ? $requestData->nomeLoja : '';
+
             $conta = $this->getDoctrine()
             ->getRepository(Conta::class)
             ->findOneBy([
@@ -105,11 +107,12 @@ class MovimentosController extends AbstractController
             
             $movimento = new Movimento();
             $movimento->setDescricao($requestData->descricao);
+            $movimento->setNomeLoja($nomeLoja);
             $movimento->setValor($valorMovimento);
             $movimento->setData($dataMovimento);
             $movimento->setConta($conta);
-            // $movimento->setCreatedAt(new DateTimeImmutable());
-            // $movimento->setUpdatedAt(new DateTimeImmutable());
+            $movimento->setCreatedAt(new DateTimeImmutable());
+            $movimento->setUpdatedAt(new DateTimeImmutable());
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($movimento);
@@ -156,6 +159,8 @@ class MovimentosController extends AbstractController
             $dataMovimento = new DateTime($requestData->data);
             $valorMovimento = str_replace(',','.',$requestData->valor);
 
+            $nomeLoja = $requestData->descricao !== null && $requestData->descricao !== '' ? $requestData->nomeLoja : '';
+
             $movimento = $this->getDoctrine()
             ->getRepository(Movimento::class)
             ->findOneBy([
@@ -167,6 +172,7 @@ class MovimentosController extends AbstractController
             }
 
             $movimento->setDescricao($requestData->descricao);
+            $movimento->setNomeLoja($nomeLoja);
             $movimento->setValor($valorMovimento);
             $movimento->setData($dataMovimento);
             // $movimento->setUpdatedAt(new DateTimeImmutable());

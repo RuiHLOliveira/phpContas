@@ -5,6 +5,7 @@ namespace App\Controller;
 use DateTime;
 use DateTimeZone;
 use App\Entity\Conta;
+use DateTimeImmutable;
 use App\Entity\Movimento;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -138,13 +139,21 @@ class BackupController extends AbstractController
                     $data = new DateTime($movimento['data']['date']);
                     $movimentoObj->setData($data);
 
-                    // $timezone = new DateTimeZone($movimento['created_at']['timezone']);
-                    // $created_at = new DateTime($movimento['created_at']['date'], $timezone);
-                    // $movimentoObj->setCreatedAt($created_at);
+                    if(isset($movimento['createdAt'])) {
+                        $timezone = new DateTimeZone($movimento['createdAt']['timezone']);
+                        $created_at = new DateTime($movimento['createdAt']['date'], $timezone);
+                        $movimentoObj->setCreatedAt($created_at);
+                    } else {
+                        $movimento->setCreatedAt(new DateTimeImmutable());
+                    }
         
-                    // $timezone = new DateTimeZone($movimento['updated_at']['timezone']);
-                    // $updated_at = new DateTime($movimento['updated_at']['date'], $timezone);
-                    // $movimentoObj->setUpdatedAt($updated_at);
+                    if(isset($movimento['updatedAt'])) {
+                        $timezone = new DateTimeZone($movimento['updatedAt']['timezone']);
+                        $updated_at = new DateTime($movimento['updatedAt']['date'], $timezone);
+                        $movimentoObj->setUpdatedAt($updated_at);
+                    } else {
+                        $movimento->setUpdatedAt(new DateTimeImmutable());
+                    }
                     
                     $movimentoObj->setconta($contaObj);
                     // $movimentoObj->setUser($user);

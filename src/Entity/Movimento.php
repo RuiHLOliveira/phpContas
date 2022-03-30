@@ -18,8 +18,9 @@ class Movimento implements JsonSerializable
             'descricao' => $this->getDescricao(),
             'valor' => $this->getValor(),
             'data' => $this->getData(),
-            // 'createdAt' => $this->getCreatedAt(),
-            // 'updatedAt' => $this->getUpdatedAt(),
+            'nomeLoja' => $this->getNomeLoja(),
+            'createdAt' => $this->getCreatedAt(),
+            'updatedAt' => $this->getUpdatedAt(),
         ];
         return $array;
     }
@@ -51,6 +52,21 @@ class Movimento implements JsonSerializable
      * @ORM\JoinColumn(nullable=false)
      */
     private $conta;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nomeLoja;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $created_at;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updated_at;
 
     public function getId(): ?int
     {
@@ -101,6 +117,42 @@ class Movimento implements JsonSerializable
     public function setConta(?Conta $conta): self
     {
         $this->conta = $conta;
+
+        return $this;
+    }
+
+    public function getNomeLoja(): ?string
+    {
+        return $this->nomeLoja;
+    }
+
+    public function setNomeLoja(?string $nomeLoja): self
+    {
+        $this->nomeLoja = $nomeLoja;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $created_at): self
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $updated_at): self
+    {
+        $this->updated_at = $updated_at;
 
         return $this;
     }
