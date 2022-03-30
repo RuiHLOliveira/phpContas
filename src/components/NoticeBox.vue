@@ -1,8 +1,10 @@
 <style>
 .noticeBox {
     position: absolute;
+    /* top: 10px; */
+    /* right: 20px; */
     top: 10px;
-    right: 20px;
+    right: 0px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -13,8 +15,8 @@
 .noticeBoxContainer {
     position: relative;
     display: inline-block;
-    width: 300px;
-    padding: 20px;
+    width: 100px;
+    padding: 15px;
     margin-bottom: 10px;
     background-color: #ffffff;
     animation: fadeInDown .3s forwards;
@@ -54,10 +56,7 @@
                     'noticebox-error': notice.type == 'error',
                     'noticebox-success': notice.type == 'success'
                 }">
-                    <!-- <div class="noticeBox_closeButton" @click="close()">
-                        <i class="fas fa-times"></i>
-                    </div> -->
-                    [{{notice.type}}] {{ notice.message }}
+                    {{ notice.message }}
                 </div>
             </div>
         </div>
@@ -92,14 +91,12 @@ export default {
         addNotice(message, type = 'success', time = null) {
             if (time == null) time = 3;
             let newNotice = {id: this.getNextId(), message: message, type: type};
-            console.log('[LOG] id',newNotice.id);
             this.noticeboxQueue.push(newNotice);
             this.lastId++;
             let timeout = setTimeout(() => {
                 this.noticeboxQueue.shift();
                 if(this.noticeboxQueue.length == 0) {
                     this.lastId = 0;
-                    console.log('[LOG] Zerou!');
                 }
             }, time * 1000);
         }

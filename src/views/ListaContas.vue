@@ -9,7 +9,7 @@
         <div class="pageTitle">Contas</div>
       </div>
 
-      <div class="whitebox">
+      <div class="whitebox mt5">
         <div class="pageSubtitle">Criar Conta</div>
         <input name="nome" class="form-input"
           type="text" placeholder="nome" 
@@ -17,25 +17,23 @@
         <button class="btn" @click="criarconta()">Criar conta</button>
       </div>
     
-      <div class="box">
+      <div class="box mt10">
         <div class="pageSubtitle">Lista de Contas</div>
-        <div v-for="conta in contas" :key="conta.id" class="whitebox flex-column justify-spacebetween"><!-- flex justify-spacebetween alignitens-center">-->
-          <span class="mv5">
-            {{ conta.nome }}
-          </span>
-          <span class="mv5">
-            R$ {{ conta.saldo }}
-          </span>
-          <span class="mv5">
-            <router-link v-bind:to="'/listaMovimentos/'+conta.id" class="btn"><i class="fas fa-arrow-right"></i> Acessar</router-link>
-          </span>
-          <span class="mv5">
-            <button @click="ativarModalEdicao(conta.id)" class="btn"><i class="fas fa-edit"></i> editar</button>
-            </span>
-          <span class="mv5">
-            <button @click="ativarModalExcluirConta(conta.id)" class="btn"><i class="fas fa-trash"></i> excluir</button>
-          </span>
-        </div>
+      </div>
+
+      <div v-for="conta in contas" :key="conta.id" class="whitebox mt10 flex-column justify-spacebetween"><!-- flex justify-spacebetween alignitens-center">-->
+        <span class="mv5">
+          {{ conta.nome }} [R$ {{ conta.saldo }}]
+        </span>
+        <span class="mv5">
+          <router-link v-bind:to="'/listaMovimentos/'+conta.id" class="btn btn-sm"><i class="fas fa-arrow-right"></i> Acessar</router-link>
+        <!-- </span>
+        <span class="mv5"> -->
+          <button @click="ativarModalEdicao(conta.id)" class="btn btn-sm ml5"><i class="fas fa-edit"></i> Editar</button>
+        <!-- </span>
+        <span class="mv5"> -->
+          <button @click="ativarModalExcluirConta(conta.id)" class="btn btn-sm ml5"><i class="fas fa-trash"></i> Excluir</button>
+        </span>
       </div>
     </div>
 

@@ -13,3 +13,9 @@
 .btn:hover {
     background: #eaeaea;
 }
+
+.btn.btn-sm {
+    font-size: 0.8rem;
+}
+
+.btn.btn-sm:hover {}

@@ -1,7 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
-* {
+html {
     font-family: 'Ubuntu', sans-serif;
     color: #000000;
+    font-size: 16px;
+}
+
+button {
+    font-size: 1rem;
+}
+
+input {
     font-size: 1rem;
 }
 
@@ -11,24 +19,29 @@ body {
 }
 
 .page {
-    background-color: #f1f5f9;
+    /* background-color: #f1f5f9; */
+    background-color: #dae0e7;
     margin: 0px;
     padding: 15px;
 }
 
 .pageTitle {
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 2rem;
+    /* font-weight: bold; */
 }
 
 .pageSubtitle {
-    font-size: 1.1rem;
-    font-weight: bold;
+    font-size: 1.5rem;
+    /* font-weight: bold; */
+}
+
+.font-size-small {
+    font-size: 0.8rem;
 }
 
 .box {
     padding: 15px 0px;
-    margin-top: 15px;
+    /* margin-top: 15px; */
 }
 
 .whitebox {
@@ -36,7 +49,7 @@ body {
     border: 1px solid #e4e4e4;
     border-radius: 10px;
     padding: 15px;
-    margin-top: 15px;
+    /* margin-top: 15px; */
 }
 
 .form-input {
@@ -76,6 +89,36 @@ body {
 
 .color-white {
     color: white;
+}
+
+table,
+table tr,
+table tr td,
+table tr th {
+    border: 0px solid black;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.fixed {
+    position: fixed;
+}
+
+.listaMovimentos {
+    width: 100%;
+}
+
+.listaMovimentos tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.listaMovimentos td,
+.listaMovimentos th {
+    padding: 5px 10px;
+}
+
+.align-right {
+    text-align: right;
 }
 
 .modalBackground {

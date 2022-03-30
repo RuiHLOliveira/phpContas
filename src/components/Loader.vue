@@ -19,7 +19,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .loaderContainer {
   position:absolute;
   top: 0;

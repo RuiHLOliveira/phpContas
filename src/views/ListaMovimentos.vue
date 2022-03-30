@@ -1,88 +1,76 @@
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
-
-table,
-table tr,
-table tr td,
-table tr th {
-  border: 0px solid black;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.fixed {
-  position: fixed;
-}
-
-.listaMovimentos {
-  width: 100%;
-}
-.listaMovimentos tr {
-  border-bottom: 1px solid #dddddd;
-}
-.listaMovimentos td,
-.listaMovimentos th {
-  padding: 5px 10px;
-}
-
-.align-right {
-  text-align: right;
-}
 
 </style>
 
 <template>
   <div>
-    <div>
+    <div class="page">
 
-      <div class="pageTitle">Movimentos</div>
-
-      <div class="pageSubtitle">Criar Movimento</div>
-      
-      <div class="flex-column">
-
-        <input name="descricao" class="form-input" type="text" placeholder="descricao" v-model="novoMovimentoDescricao">
-
-        <input name="nomeLoja" class="form-input" type="text" placeholder="nomeLoja" v-model="novoMovimentoNomeLoja">
-          
-        <input name="valor" class="form-input" type="money" placeholder="valor" v-model="novoMovimentoValor">
-          
-        <input name="data" class="form-input" type="date" placeholder="data" v-model="novoMovimentoData">
-
-        <button class="form-input btn" @click="criarMovimento()">Criar movimento</button>
-
+      <div class="box">
+        <div class="pageTitle">Movimentos</div>
       </div>
 
+      <div class="whitebox mt10">
+        <div class="pageSubtitle">Criar Movimento</div>
+        <div class="flex-column">
+          <input name="descricao" class="form-input" type="text" placeholder="descricao" v-model="novoMovimentoDescricao">
+          <input name="nomeLoja" class="form-input" type="text" placeholder="nomeLoja" v-model="novoMovimentoNomeLoja">
+          <input name="valor" class="form-input" type="money" placeholder="valor" v-model="novoMovimentoValor">
+          <input name="data" class="form-input" type="date" placeholder="data" v-model="novoMovimentoData">
+          <span><button class="form-input btn" @click="criarMovimento()">Criar movimento</button></span>
+        </div>
+      </div>
 
-      <div class="pageSubtitle">Dados da conta</div>
-      <span>{{conta.nome}} - R$ {{conta.saldo}}</span>
+      <div class="whitebox mt10">
+        <div class="pageSubtitle">Dados da conta</div>
+        <span>{{conta.nome}} - R$ {{conta.saldo}}</span>
+      </div>
 
+      <div class="whitebox mt10">
+        <div class="pageSubtitle">Movimentos</div>
+        <div class="whitebox mt10 flex-column font-size-small" v-for="movimento in movimentos" :key="movimento.id">
+          <span class="mv5">
+            {{ movimento.nomeLoja }} *** {{ movimento.descricao }}
+          </span>
+          <span class="mv5">
+            {{ movimento.valor }}
+          </span>
+          <span class="mv5">
+            {{ movimento.dataExibicao }}
+          </span>
+          <span class="mv5">
+            <button class="btn btn-sm" @click="ativarModalEdicao(movimento.id)"><i class="fas fa-edit"></i> Editar</button>
+            <button class="btn btn-sm ml5" @click="excluirMovimento(movimento.id)"><i class="fas fa-trash-alt"></i> Excluir</button>
+          </span>
+        </div>
+      </div>
+
+      <!-- <div class="whitebox">
+        <div class="pageSubtitle">Movimentos</div>
+        <table class="listaMovimentos">
+          <tr>
+            <th>descricao</th>
+            <th class="align-right">valor</th>
+            <th class="align-right">data</th>
+            <th class="align-right">acoes</th>
+          </tr>
+          <tr v-for="movimento in movimentos" :key="movimento.id">
+            <td>{{ movimento.nomeLoja }} *** {{ movimento.descricao }}</td>
+            <td class="align-right">{{ movimento.valor }}</td>
+            <td class="align-right">{{ movimento.dataExibicao }}</td>
+            <td class="align-right">
+              <button class="btn" @click="ativarModalEdicao(movimento.id)"><i class="fas fa-edit"></i></button>
+              <button class="btn" @click="excluirMovimento(movimento.id)"><i class="fas fa-trash-alt"></i></button>
+            </td>
+          </tr>
+        </table>
+      </div> -->
+      
+      <Loader :busy="busy"></Loader>
+
+      <ModalEditarMovimento :exibirModalEdicao.sync="exibirModalEdicao" :movimento="movimentoEditar"></ModalEditarMovimento>
+      <!-- <ModalExcluirConta :exibirModalExcluirConta.sync="exibirModalExcluirConta" :conta="contaExcluir"></ModalExcluirConta> -->
     </div>
-
-    <div class="pageSubtitle">Movimentos</div>
-    <table class="listaMovimentos">
-      <tr>
-        <th>descricao</th>
-        <th class="align-right">valor</th>
-        <th class="align-right">data</th>
-        <th class="align-right">acoes</th>
-      </tr>
-      <tr v-for="movimento in movimentos" :key="movimento.id">
-        <td>{{ movimento.nomeLoja }} *** {{ movimento.descricao }}</td>
-        <td class="align-right">{{ movimento.valor }}</td>
-        <td class="align-right"><!--{{ movimento.data }} - -->{{ movimento.dataExibicao }}</td>
-        <td class="align-right">
-          <button class="btn" @click="ativarModalEdicao(movimento.id)"><i class="fas fa-edit"></i></button>
-          <button class="btn" @click="excluirMovimento(movimento.id)"><i class="fas fa-trash-alt"></i></button>
-          <!-- <button @click="ativarModalExcluirConta(conta.id)" class="btn">excluir</button> -->
-        </td>
-      </tr>
-    </table>
-    
-    <Loader :busy="busy"></Loader>
-
-    <ModalEditarMovimento :exibirModalEdicao.sync="exibirModalEdicao" :movimento="movimentoEditar"></ModalEditarMovimento>
-    <!-- <ModalExcluirConta :exibirModalExcluirConta.sync="exibirModalExcluirConta" :conta="contaExcluir"></ModalExcluirConta> -->
   </div>
 </template>
 
