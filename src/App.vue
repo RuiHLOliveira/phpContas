@@ -14,7 +14,10 @@
 </template>
 
 <style>
-
+@import './assets/style.css';
+@import './assets/padding.css';
+@import './assets/margin.css';
+@import './assets/buttons.css';
 </style>
 
 <script>

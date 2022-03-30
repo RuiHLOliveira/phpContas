@@ -46,6 +46,7 @@ export default {
       this.exibirModal = false;
       this.$emit('update:exibirModalExcluirConta', this.exibirModal)
       if(this.excluidoComSucesso == true){
+        this.excluidoComSucesso = false;
         EventBus.$emit('LISTACONTAS_INDEX', {});
       }
     },

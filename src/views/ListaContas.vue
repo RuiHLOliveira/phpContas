@@ -1,152 +1,40 @@
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
-* {
-  font-family: 'Ubuntu', sans-serif;
-  color: #000000;
-}
-.pageTitle {
-  font-size: 1.5rem;
-  margin: 20px 0px 10px 0px;
-}
-.pageSubtitle {
-  font-size: 1.1rem;
-  margin: 20px 0px 10px 0px;
-}
-.form-input {
-  margin: 10px 0px;
-  padding: 10px;
-  display: block;
-}
-
-.form-input.btn {
-  margin: 10px 0px;
-  padding: 10px;
-  display: block;
-}
-
-.btn {
-  text-decoration: none;
-  border: 0px;
-  margin: 5px 5px;
-  padding: 5px 10px;
-  color: inherit;
-}
-.btn:hover {
-  background: #ffffff77;
-}
-
-.btn-lightgray {
-  border: 0px;
-  margin: 5px 5px;
-  padding: 5px 10px;
-  background: #eaeaea;
-}
-.btn-lightgray:hover {
-  background: #dadada;
-}
-
-.conta {
-  border-radius: 3px;
-  background: #81b6e2;
-  margin: 10px 0px;
-  padding: 5px 10px;
-  color: #ffffff;
-}
-
-.flex {
-  display: flex;
-}
-
-.flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-.justify-spacebetween {
-  justify-content: space-between;
-}
-
-.alignitens-start {
-  align-items: flex-start;
-}
-.alignitens-center {
-  align-items: center;
-}
-
-
-
-.p5 {
-  padding: 5px;
-}
-.pv5 {
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
-.ph5 {
-  padding-right: 5px;
-  padding-left: 5px;
-}
-.pt5{
-  padding-top: 5px;
-}
-.pr5{
-  padding-right: 5px;
-}
-.pb5{
-  padding-bottom: 5px;
-}
-.pl5{
-  padding-left: 5px;
-}
-
-.p10 {
-  padding: 10px;
-}
-.pv10 {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-.ph10 {
-  padding-right: 10px;
-  padding-left: 10px;
-}
-.pt10{
-  padding-top: 10px;
-}
-.pr10{
-  padding-right: 10px;
-}
-.pb10{
-  padding-bottom: 10px;
-}
-.pl10{
-  padding-left: 10px;
-}
-
 </style>
 
 <template>
-  <div>
-    <div class="pageTitle">Contas</div>
+  <div class="page">
 
-    <div class="pageSubtitle">Criar Conta</div>
+    <div class="box">
+      <div class="pageTitle">Contas</div>
+    </div>
+
+    <div class="whitebox">
+      <div class="pageSubtitle">Criar Conta</div>
+      <input name="nome" class="form-input"
+        type="text" placeholder="nome" 
+        v-model="novaNotaNome">
+      <button class="btn" @click="criarconta()">Criar conta</button>
+    </div>
     
-    <input name="nome" class="form-input"
-      type="text" placeholder="nome" 
-      v-model="novaNotaNome">
-    <button class="btn form-input" @click="criarconta()">Criar conta</button>
-
-    <div class="pageSubtitle">Contas</div>
-
-    <div v-for="conta in contas" :key="conta.id" class="conta flex justify-spacebetween alignitens-center">
-      <span>
-        <router-link v-bind:to="'/listaMovimentos/'+conta.id" class="btn">{{ conta.nome }}</router-link>
-      </span>
-      <span>
-        {{ conta.saldo }}
-        <button @click="ativarModalEdicao(conta.id)" class="btn">editar</button>
-        <button @click="ativarModalExcluirConta(conta.id)" class="btn">excluir</button>
-      </span>
+    <div class="box">
+      <div class="pageSubtitle">Lista de Contas</div>
+      <div v-for="conta in contas" :key="conta.id" class="whitebox flex-column justify-spacebetween"><!-- flex justify-spacebetween alignitens-center">-->
+        <span class="mv5">
+          {{ conta.nome }}
+        </span>
+        <span class="mv5">
+          R$ {{ conta.saldo }}
+        </span>
+        <span class="mv5">
+          <router-link v-bind:to="'/listaMovimentos/'+conta.id" class="btn"><i class="fas fa-arrow-right"></i> Acessar</router-link>
+        </span>
+        <span class="mv5">
+          <button @click="ativarModalEdicao(conta.id)" class="btn"><i class="fas fa-edit"></i> editar</button>
+          </span>
+        <span class="mv5">
+          <button @click="ativarModalExcluirConta(conta.id)" class="btn"><i class="fas fa-trash"></i> excluir</button>
+        </span>
+      </div>
     </div>
 
     <Loader :busy="busy"></Loader>
@@ -243,30 +131,30 @@ export default {
         console.log('[LOG]',error);
       });
     },
-    excluirConta(idConta){
-      this.busy = true;
-      let url = 'http://localhost:8000/contas/' + idConta;
-      let data = {
-        method: 'delete',
-      };
-      fetch(url,data)
-      .then(async response => {
-        data = await response.json();
-        console.log('[LOG]',response);
-        console.log('[LOG]',data);
-        if(!response.ok){
-          this.busy = false;
-          notify.notify(data.message, "error");
-          return;
-        }
-        this.busy = false;
-        notify.notify('deletado!', "success");
-        this.buscaContas();
-      })
-      .catch(error => {
-        console.log('[LOG]',error);
-      });
-    },
+    // excluirConta(idConta){
+    //   this.busy = true;
+    //   let url = 'http://localhost:8000/contas/' + idConta;
+    //   let data = {
+    //     method: 'delete',
+    //   };
+    //   fetch(url,data)
+    //   .then(async response => {
+    //     data = await response.json();
+    //     console.log('[LOG]',response);
+    //     console.log('[LOG]',data);
+    //     if(!response.ok){
+    //       this.busy = false;
+    //       notify.notify(data.message, "error");
+    //       return;
+    //     }
+    //     this.busy = false;
+    //     notify.notify('deletado!', "success");
+    //     this.buscaContas();
+    //   })
+    //   .catch(error => {
+    //     console.log('[LOG]',error);
+    //   });
+    // },
   },
   watch: {
   },

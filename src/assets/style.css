@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+* {
+    font-family: 'Ubuntu', sans-serif;
+    color: #000000;
+    font-size: 1rem;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+}
+
+.page {
+    background-color: #f1f5f9;
+    margin: 0px;
+    padding: 15px;
+}
+
+.pageTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.pageSubtitle {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.box {
+    padding: 15px 0px;
+    margin-top: 15px;
+}
+
+.whitebox {
+    background-color: #ffffff;
+    border: 1px solid #e4e4e4;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.form-input {
+    border: 1px solid #e4e4e4;
+    border-radius: 5px;
+    margin: 10px 0px;
+    padding: 10px;
+    display: block;
+}
+
+.form-input.btn {
+    /* margin: 10px 0px; */
+    /* padding: 10px; */
+    /* display: block; */
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.justify-spacebetween {
+    justify-content: space-between;
+}
+
+.alignitens-start {
+    align-items: flex-start;
+}
+
+.alignitens-center {
+    align-items: center;
+}
+
+.color-white {
+    color: white;
+}
+
+.modalBackground {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background-color: #00000088;
+}
+
+.modal {
+    position: relative;
+    background-color: #ffffff;
+    margin: 0 auto;
+    margin-top: 20px;
+    max-width: 900px;
+}

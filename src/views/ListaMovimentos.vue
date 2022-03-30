@@ -42,6 +42,8 @@ table tr th {
       <div class="flex-column">
 
         <input name="descricao" class="form-input" type="text" placeholder="descricao" v-model="novoMovimentoDescricao">
+
+        <input name="nomeLoja" class="form-input" type="text" placeholder="nomeLoja" v-model="novoMovimentoNomeLoja">
           
         <input name="valor" class="form-input" type="money" placeholder="valor" v-model="novoMovimentoValor">
           
@@ -66,7 +68,7 @@ table tr th {
         <th class="align-right">acoes</th>
       </tr>
       <tr v-for="movimento in movimentos" :key="movimento.id">
-        <td>{{ movimento.descricao }}</td>
+        <td>{{ movimento.nomeLoja }} *** {{ movimento.descricao }}</td>
         <td class="align-right">{{ movimento.valor }}</td>
         <td class="align-right"><!--{{ movimento.data }} - -->{{ movimento.dataExibicao }}</td>
         <td class="align-right">
@@ -107,6 +109,7 @@ export default {
       busy: false,
       conta: {},
       novoMovimentoDescricao: '',
+      novoMovimentoNomeLoja: '',
       novoMovimentoValor: '',
       novoMovimentoData: '',
       buscarMovimentoOrdemDecrescente: true,
@@ -196,6 +199,7 @@ export default {
       let url = 'http://localhost:8000/movimentos';
       let body = {
         'descricao': this.novoMovimentoDescricao,
+        'nomeLoja': this.novoMovimentoNomeLoja,
         'valor': this.novoMovimentoValor,
         'data': this.novoMovimentoData,
         'idConta' : this.idConta
@@ -258,6 +262,7 @@ export default {
       // date = '2021-12-01';
       this.novoMovimentoData = date;
       this.novoMovimentoDescricao = null;
+      this.novoMovimentoNomeLoja = null;
       this.novoMovimentoValor = null;
     }
   },

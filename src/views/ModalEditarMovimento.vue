@@ -29,6 +29,9 @@
             <input class="form-input" type="text" v-model="movimentoLocal.descricao">
           </div>
           <div>
+            <input class="form-input" type="text" v-model="movimentoLocal.nomeLoja">
+          </div>
+          <div>
             <input class="form-input" type="text" v-model="movimentoLocal.valor">
           </div>
           <div>
@@ -79,6 +82,7 @@ export default {
       console.log(this.movimentoLocal);
       let body = {
         'descricao': this.movimentoLocal.descricao,
+        'nomeLoja': this.movimentoLocal.nomeLoja,
         'data': this.movimentoLocal.data,
         'valor': this.movimentoLocal.valor,
       };
