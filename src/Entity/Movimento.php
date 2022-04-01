@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use JsonSerializable;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MovimentoRepository;
@@ -22,8 +24,28 @@ class Movimento implements JsonSerializable
             'createdAt' => $this->getCreatedAt(),
             'updatedAt' => $this->getUpdatedAt(),
         ];
+        
+        if($this->serializarItensMovimentos == true){
+            $array['itensMovimentos'] = $this->unpackItensMovimentosToArray($this->getItensMovimentos());
+        }
         return $array;
     }
+
+    private function unpackItensMovimentosToArray($collection){
+        $itensMovimentos = $collection->toArray();
+        foreach ($itensMovimentos as $key => $item) {
+            // $movimento->setUser(null);
+            $item->setMovimento(null);
+            $itensMovimentos[$key] = $item;
+        }
+        return $itensMovimentos;
+    }
+    
+    public function serializarItensMovimentos(){
+        $this->serializarItensMovimentos = true;
+    }
+
+    public $serializarItensMovimentos = false;
 
     /**
      * @ORM\Id
@@ -67,6 +89,16 @@ class Movimento implements JsonSerializable
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $updated_at;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ItemMovimento::class, mappedBy="movimento")
+     */
+    private $itensMovimentos;
+
+    public function __construct()
+    {
+        $this->itensMovimentos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -153,6 +185,36 @@ class Movimento implements JsonSerializable
     public function setUpdatedAt(\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ItemMovimento[]
+     */
+    public function getItensMovimentos(): Collection
+    {
+        return $this->itensMovimentos;
+    }
+
+    public function addItensMovimento(ItemMovimento $itensMovimento): self
+    {
+        if (!$this->itensMovimentos->contains($itensMovimento)) {
+            $this->itensMovimentos[] = $itensMovimento;
+            $itensMovimento->setMovimento($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItensMovimento(ItemMovimento $itensMovimento): self
+    {
+        if ($this->itensMovimentos->removeElement($itensMovimento)) {
+            // set the owning side to null (unless already changed)
+            if ($itensMovimento->getMovimento() === $this) {
+                $itensMovimento->setMovimento(null);
+            }
+        }
 
         return $this;
     }

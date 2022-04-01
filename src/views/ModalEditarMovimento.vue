@@ -21,6 +21,22 @@
           <div>
             <input class="form-input" type="date" v-model="movimentoLocal.data">
           </div>
+          <span class="mt10">Lista de Itens do Movimento</span>
+          
+          <div class="whitebox mt10 flex justify-spacebetween alignitens-start" v-for="item in movimentoLocal.itensMovimentos" :key="item.id">
+            <div>
+              {{item.nome}} - R$ {{item.valor}}
+              <input name="nome" class="form-input form-input-sm font-size-small" type="text" placeholder="nome" v-model="item.nome">
+              <input name="valor" class="form-input form-input-sm font-size-small" type="money" placeholder="valor" v-model="item.valor">
+            </div>
+            <div>
+              <button class="btn font-size-small" @click="retirarItemMovimento(item.id)"><i class="fas fa-times"></i> </button>
+            </div>
+          </div>
+          <span>
+            <button class="form-input btn btn-sm" @click="adicionarItemMovimento()">Adicionar Item</button>
+          </span>
+
           <div class="flex">
             <button class="btn form-input" @click="fecharModal()">Fechar</button>
             <button class="btn form-input" @click="editarMovimento()">Salvar</button>
@@ -61,6 +77,7 @@ export default {
       if(this.editadoComSucesso == true) EventBus.$emit('LISTAMOVIMENTOS_INDEX', {});
     },
     editarMovimento() {
+      console.log('[LOG]',this.movimentoLocal.itensMovimentos);
       this.busy = true;
       let url = 'http://localhost:8000/movimentos/' + this.movimentoLocal.id;
       console.log(this.movimentoLocal);
@@ -68,7 +85,8 @@ export default {
         'descricao': this.movimentoLocal.descricao,
         'nomeLoja': this.movimentoLocal.nomeLoja,
         'data': this.movimentoLocal.data,
-        'valor': this.movimentoLocal.valor,
+        // 'valor': this.movimentoLocal.valor,
+        'itensMovimentos': this.movimentoLocal.itensMovimentos
       };
       let data = {
         method: 'PUT',

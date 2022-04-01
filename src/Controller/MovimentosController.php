@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use DateTime;
 use App\Entity\Conta;
+use App\Entity\ItemMovimento;
 use DateTimeImmutable;
 use App\Entity\Movimento;
 use App\Exception\ValidationException;
@@ -43,6 +44,9 @@ class MovimentosController extends AbstractController
             }
 
             $movimentos = $this->getDoctrine()->getRepository(Movimento::class)->findBy($filtros, $orderby);
+            foreach ($movimentos as $key => $value) {
+                $movimentos[$key]->serializarItensMovimentos();
+            }
 
             return new JsonResponse(compact('movimentos'),200);
 
@@ -87,8 +91,8 @@ class MovimentosController extends AbstractController
             if($requestData->descricao === null || $requestData->descricao === ''){
                 throw new ValidationException('Descricao is needed');
             }
-            if($requestData->valor === null || $requestData->valor === ''){
-                throw new ValidationException('Valor is needed');
+            if($requestData->itensMovimentos === null || count($requestData->itensMovimentos) == 0){
+                throw new ValidationException('Itens is needed');
             }
             if($requestData->data === null || $requestData->data === ''){
                 throw new ValidationException('Data is needed');
@@ -105,10 +109,16 @@ class MovimentosController extends AbstractController
                 'id' => $requestData->idConta
             ]);
             
+            $totalValorMovimento = 0;
+            foreach ($requestData->itensMovimentos as $key => $itemMovimento) {
+                $valor = str_replace(',','.', $itemMovimento->valor);
+                $totalValorMovimento += $valor;
+            }
+
             $movimento = new Movimento();
             $movimento->setDescricao($requestData->descricao);
             $movimento->setNomeLoja($nomeLoja);
-            $movimento->setValor($valorMovimento);
+            $movimento->setValor($totalValorMovimento);
             $movimento->setData($dataMovimento);
             $movimento->setConta($conta);
             $movimento->setCreatedAt(new DateTimeImmutable());
@@ -118,12 +128,24 @@ class MovimentosController extends AbstractController
             $entityManager->persist($movimento);
             $entityManager->flush();
 
+
+            foreach ($requestData->itensMovimentos as $key => $itemMovimento) {
+                $valor = str_replace(',','.', $itemMovimento->valor);
+                $itemMovimentoObj = new ItemMovimento();
+                $itemMovimentoObj->setMovimento($movimento);
+                $itemMovimentoObj->setValor($valor);
+                $itemMovimentoObj->setNome($itemMovimento->nome);
+                $entityManager->persist($itemMovimentoObj);
+                $entityManager->flush();
+            }
+
             $conta = $this->atualizaSaldoConta($conta);
 
             $movimento = $this->getDoctrine()->getRepository(Movimento::class)
                 ->findOneBy([
                 'id' => $movimento->getId()
             ]);
+            $movimento->serializarItensMovimentos();
 
             return new JsonResponse(compact('movimento'),201);
         } catch (ValidationException $e) {
@@ -149,15 +171,15 @@ class MovimentosController extends AbstractController
             if($requestData->descricao === null || $requestData->descricao === ''){
                 throw new ValidationException('Descricao is needed');
             }
-            if($requestData->valor === null || $requestData->valor === ''){
-                throw new ValidationException('Valor is needed');
+            if($requestData->itensMovimentos === null || count($requestData->itensMovimentos) == 0){
+                throw new ValidationException('Itens is needed');
             }
             if($requestData->data === null || $requestData->data === ''){
                 throw new ValidationException('Data is needed');
             }
 
             $dataMovimento = new DateTime($requestData->data);
-            $valorMovimento = str_replace(',','.',$requestData->valor);
+            // $valorMovimento = str_replace(',','.',$requestData->valor);
 
             $nomeLoja = $requestData->descricao !== null && $requestData->descricao !== '' ? $requestData->nomeLoja : '';
 
@@ -171,14 +193,40 @@ class MovimentosController extends AbstractController
                 throw new NotFoundHttpException('Movimento não encontrada.');
             }
 
+            $totalValorMovimento = 0;
+            foreach ($requestData->itensMovimentos as $key => $itemMovimento) {
+                $valor = str_replace(',','.', $itemMovimento->valor);
+                $totalValorMovimento += $valor;
+            }
+
             $movimento->setDescricao($requestData->descricao);
             $movimento->setNomeLoja($nomeLoja);
-            $movimento->setValor($valorMovimento);
+            $movimento->setValor($totalValorMovimento);
             $movimento->setData($dataMovimento);
             // $movimento->setUpdatedAt(new DateTimeImmutable());
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($movimento);
+
+            foreach ($requestData->itensMovimentos as $key => $itemMovimento) {
+
+                $itemMovimentoObj = $this->getDoctrine()
+                ->getRepository(ItemMovimento::class)
+                ->findOneBy([
+                    'id' => $itemMovimento->id
+                ]);
+
+                if($itemMovimentoObj == null) {
+                    throw new NotFoundHttpException('Item Movimento não encontrada.');
+                }
+
+                $valor = str_replace(',','.', $itemMovimento->valor);
+
+                $itemMovimentoObj->setValor($valor);
+                $itemMovimentoObj->setNome($itemMovimento->nome);
+                $em->persist($itemMovimentoObj);
+            }
+
             $em->flush();
 
             $conta = $this->getDoctrine()
@@ -216,6 +264,9 @@ class MovimentosController extends AbstractController
             }
 
             $em = $this->getDoctrine()->getManager();
+            foreach ($movimento->getItensMovimentos() as $key => $item) {
+                $em->remove($item);
+            }
             $em->remove($movimento);
             $em->flush();
             

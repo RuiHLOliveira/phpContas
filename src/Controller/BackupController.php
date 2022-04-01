@@ -5,6 +5,7 @@ namespace App\Controller;
 use DateTime;
 use DateTimeZone;
 use App\Entity\Conta;
+use App\Entity\ItemMovimento;
 use DateTimeImmutable;
 use App\Entity\Movimento;
 use PHPMailer\PHPMailer\SMTP;
@@ -57,7 +58,7 @@ class BackupController extends AbstractController
     /**
      * @Route("/backup/export", name="backupExport")
      */
-    public function index(Request $request): Response
+    public function export(Request $request): Response
     {
         try {
             // $user = $this->getUser();
@@ -67,7 +68,8 @@ class BackupController extends AbstractController
             ->findAll();
 
             foreach ($contas as $key => $conta) {
-                $conta->fullSerialize = true;
+                $conta->serializarMovimentos();
+                $conta->serializarItensMovimentos();
             }
 
             $json = json_encode(compact('contas'));
@@ -145,7 +147,7 @@ class BackupController extends AbstractController
                         $created_at = new DateTime($movimento['createdAt']['date'], $timezone);
                         $movimentoObj->setCreatedAt($created_at);
                     } else {
-                        $movimento->setCreatedAt(new DateTimeImmutable());
+                        $movimentoObj->setCreatedAt(new DateTimeImmutable());
                     }
         
                     if(isset($movimento['updatedAt'])) {
@@ -153,7 +155,7 @@ class BackupController extends AbstractController
                         $updated_at = new DateTime($movimento['updatedAt']['date'], $timezone);
                         $movimentoObj->setUpdatedAt($updated_at);
                     } else {
-                        $movimento->setUpdatedAt(new DateTimeImmutable());
+                        $movimentoObj->setUpdatedAt(new DateTimeImmutable());
                     }
                     
                     $movimentoObj->setconta($contaObj);
@@ -161,6 +163,24 @@ class BackupController extends AbstractController
 
                     $entityManager->persist($movimentoObj);
                     $entityManager->flush();
+
+                    if(!isset($movimento['itensMovimentos']) || count($movimento['itensMovimentos']) == 0) {
+                        $itemMovimentoObj = new ItemMovimento();
+                        $itemMovimentoObj->setNome($movimento['descricao']);
+                        $itemMovimentoObj->setValor($movimento['valor']);
+                        $itemMovimentoObj->setMovimento($movimentoObj);
+                        $entityManager->persist($itemMovimentoObj);
+                        $entityManager->flush();
+                    }
+
+                    foreach ($movimento['itensMovimentos'] as $key => $itemMovimento) {
+                        $itemMovimentoObj = new ItemMovimento();
+                        $itemMovimentoObj->setNome($itemMovimento['nome']);
+                        $itemMovimentoObj->setValor($itemMovimento['valor']);
+                        $itemMovimentoObj->setMovimento($movimentoObj);
+                        $entityManager->persist($itemMovimentoObj);
+                        $entityManager->flush();
+                    }
                 }
 
             }

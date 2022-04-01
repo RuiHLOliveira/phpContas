@@ -147,6 +147,9 @@ class ContasController extends AbstractController
 
             // remover movimentos da conta
             foreach ($movimentos as $key => $movimento) {
+                foreach ($movimento->getItensMovimentos() as $key => $value) {
+                    $em->remove($value);
+                }
                 $em->remove($movimento);
             }
 

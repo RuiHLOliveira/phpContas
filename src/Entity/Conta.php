@@ -23,7 +23,7 @@ class Conta implements JsonSerializable
             'updatedAt' => $this->getUpdatedAt(),
         ];
 
-        if($this->fullSerialize == true){
+        if($this->serializarMovimentos == true){
             $array['movimentos'] = $this->unpackMovimentosToArray($this->getMovimentos());
         }
         return $array;
@@ -32,6 +32,9 @@ class Conta implements JsonSerializable
     private function unpackMovimentosToArray($collection){
         $movimentos = $collection->toArray();
         foreach ($movimentos as $key => $movimento) {
+            if($this->serializarItensMovimentos == true){
+                $movimento->serializarItensMovimentos();
+            }
             // $movimento->setUser(null);
             $movimento->setConta(null);
             $movimentos[$key] = $movimento;
@@ -39,7 +42,15 @@ class Conta implements JsonSerializable
         return $movimentos;
     }
 
-    public $fullSerialize = false;
+    public function serializarMovimentos(){
+        $this->serializarMovimentos = true;
+    }
+    public function serializarItensMovimentos(){
+        $this->serializarItensMovimentos = true;
+    }
+
+    private $serializarMovimentos = false;
+    private $serializarItensMovimentos = false;
 
     /**
      * @ORM\Id

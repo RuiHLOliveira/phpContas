@@ -17,7 +17,26 @@
           <input name="nomeLoja" class="form-input" type="text" placeholder="nomeLoja" v-model="novoMovimentoNomeLoja">
           <input name="valor" class="form-input" type="money" placeholder="valor" v-model="novoMovimentoValor">
           <input name="data" class="form-input" type="date" placeholder="data" v-model="novoMovimentoData">
-          <span><button class="form-input btn" @click="criarMovimento()">Criar movimento</button></span>
+
+          <span class="mt10">Lista de Itens do Movimento</span>
+          
+          <div class="whitebox mt10 flex justify-spacebetween alignitens-start" v-for="item in listaNovosItensMovimentos" :key="item.id">
+            <div>
+              {{item.nome}} - R$ {{item.valor}}
+              <input name="nome" class="form-input form-input-sm font-size-small" type="text" placeholder="nome" v-model="item.nome">
+              <input name="valor" class="form-input form-input-sm font-size-small" type="money" placeholder="valor" v-model="item.valor">
+            </div>
+            <div>
+              <button class="btn font-size-small" @click="retirarItemMovimento(item.id)"><i class="fas fa-times"></i> </button>
+            </div>
+          </div>
+          <span>
+            <button class="form-input btn btn-sm" @click="adicionarItemMovimento()">Adicionar Item</button>
+          </span>
+
+          <span class="mt10">
+            <button class="form-input btn" @click="criarMovimento()">Criar movimento</button>
+          </span>
         </div>
       </div>
 
@@ -28,12 +47,15 @@
 
       <div class="whitebox mt10">
         <div class="pageSubtitle">Movimentos</div>
-        <div class="whitebox mt10 flex-column font-size-small" v-for="movimento in movimentos" :key="movimento.id">
+        <div class="whitebox max-width-800 mt10 flex-column font-size-small" v-for="movimento in movimentos" :key="movimento.id">
           <span class="mv5">
             {{ movimento.nomeLoja }} *** {{ movimento.descricao }}
           </span>
-          <span class="mv5">
-            {{ movimento.valor }}
+          <span class="mv5 align-right">
+            Total: R$ {{ movimento.valor }}
+          </span>
+          <span class="mv5 align-right" v-for="item in movimento.itensMovimentos" :key="item.id">
+            {{item.nome}} R$ {{item.valor}}
           </span>
           <span class="mv5">
             {{ movimento.dataExibicao }}
@@ -69,7 +91,6 @@
       <Loader :busy="busy"></Loader>
 
       <ModalEditarMovimento :exibirModalEdicao.sync="exibirModalEdicao" :movimento="movimentoEditar"></ModalEditarMovimento>
-      <!-- <ModalExcluirConta :exibirModalExcluirConta.sync="exibirModalExcluirConta" :conta="contaExcluir"></ModalExcluirConta> -->
     </div>
   </div>
 </template>
@@ -79,15 +100,12 @@ import EventBus from '@/core/EventBus.js';
 import notify from '@/core/notify.js';
 import Loader from '@/components/Loader.vue';
 import ModalEditarMovimento from '@/views/ModalEditarMovimento.vue';
-// import ModalEditarConta from '@/views/ModalEditarConta.vue';
-// import ModalExcluirConta from '@/views/ModalExcluirConta.vue';
 
 export default {
   name: 'ListaContas',
   components: {
     Loader,
     ModalEditarMovimento,
-    // ModalExcluirConta
   },
   props: {
     idConta: String
@@ -100,32 +118,17 @@ export default {
       novoMovimentoNomeLoja: '',
       novoMovimentoValor: '',
       novoMovimentoData: '',
+      novoItemMovimentoNome: '',
+      novoItemMovimentoValor: '',
+      listaNovosItensMovimentos: [],
+
       buscarMovimentoOrdemDecrescente: true,
       movimentos: [],
-      // noticeboxQueue: [],
       exibirModalEdicao: false,
-      // exibirModalExcluirConta: false,
       movimentoEditar: {},
-      // contaExcluir: {}
     }
   },
   methods: {
-    // ativarModalExcluirConta (contaId) {
-    //   let contaEncontrada = this.contas.filter((conta) => {
-    //     return conta.id == contaId;
-    //   });
-    //   contaEncontrada = contaEncontrada[0]
-    //   this.contaExcluir = contaEncontrada
-    //   this.exibirModalExcluirConta = true;
-    // },
-    // ativarModalEdicao (contaId) {
-    //   let contaEncontrada = this.contas.filter((conta) => {
-    //     return conta.id == contaId;
-    //   });
-    //   contaEncontrada = contaEncontrada[0]
-    //   this.contaEditar = contaEncontrada
-    //   this.exibirModalEdicao = true;
-    // },
     buscaConta(){
       this.busy = true;
       let url = 'http://localhost:8000/contas/' + this.idConta;
@@ -182,7 +185,40 @@ export default {
       });
       return movimentos;
     },
+    adicionarItemMovimento(){
+      //defino o novo id
+      let id = 1;
+      for (let i = 0; i < this.listaNovosItensMovimentos.length; i++) {
+        const element = this.listaNovosItensMovimentos[i];
+        id = element.id > id ? element.id : id;
+      }
+      id++;
+      //crio o item vazio e coloco no array
+      let novoItem = {id: id, nome: '',valor: ''};
+      this.listaNovosItensMovimentos.push(novoItem);
+    },
+    retirarItemMovimento(id){
+      this.listaNovosItensMovimentos.splice(this.listaNovosItensMovimentos.findIndex(function(item){
+        return item.id === id;
+      }), 1);
+    },
     criarMovimento() {
+      //VALIDAR O listaNovosItensMovimentos
+      if(this.listaNovosItensMovimentos.length < 1) {
+        alert('preenche item');
+        return;
+      } else {
+        for (let i = 0; i < this.listaNovosItensMovimentos.length; i++) {
+          const item = this.listaNovosItensMovimentos[i];
+          if(item.nome == '') {
+            alert('preenche o nome do item');
+            return;
+          } else if (item.valor == '') {
+            alert('preenche o valor do item');
+            return;
+          }
+        }
+      }
       this.busy = true;
       let url = 'http://localhost:8000/movimentos';
       let body = {
@@ -190,7 +226,8 @@ export default {
         'nomeLoja': this.novoMovimentoNomeLoja,
         'valor': this.novoMovimentoValor,
         'data': this.novoMovimentoData,
-        'idConta' : this.idConta
+        'idConta' : this.idConta,
+        'itensMovimentos': this.listaNovosItensMovimentos
       };
       let data = {
         method: 'post',
@@ -252,6 +289,7 @@ export default {
       this.novoMovimentoDescricao = null;
       this.novoMovimentoNomeLoja = null;
       this.novoMovimentoValor = null;
+      this.listaNovosItensMovimentos = [];
     }
   },
   watch: {
