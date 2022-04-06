@@ -1,11 +1,15 @@
 <style>
+.maxheight {
+  max-height: 90vh;
+  overflow-y: scroll;
+}
 </style>
 
 <template>
   <div v-if="exibirModal">
     <div class="modalBackground">
       <div class="page">
-        <div class="whitebox flex-column alignitens-start">
+        <div class="whitebox flex-column alignitens-start maxheight">
           <div>
             <div class="pageTitle">Editar Movimento</div>
           </div>
@@ -75,6 +79,18 @@ export default {
       this.exibirModal = false;
       this.$emit('update:exibirModalEdicao', this.exibirModal)
       if(this.editadoComSucesso == true) EventBus.$emit('LISTAMOVIMENTOS_INDEX', {});
+    },
+    adicionarItemMovimento(){
+      //defino o novo id
+      let id = 1;
+      for (let i = 0; i < this.movimentoLocal.itensMovimentos.length; i++) {
+        const element = this.movimentoLocal.itensMovimentos[i];
+        id = element.id > id ? element.id : id;
+      }
+      id++;
+      //crio o item vazio e coloco no array
+      let novoItem = {id: id, nome: '',valor: ''};
+      this.movimentoLocal.itensMovimentos.push(novoItem);
     },
     editarMovimento() {
       console.log('[LOG]',this.movimentoLocal.itensMovimentos);

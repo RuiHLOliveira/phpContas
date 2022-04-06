@@ -40,13 +40,22 @@
         </div>
       </div>
 
-      <div class="whitebox mt10">
+      <div class="whitebox mt10 flex-column">
         <div class="pageSubtitle">Dados da conta</div>
-        <span>{{conta.nome}} - R$ {{conta.saldo}}</span>
+        <span class="mt10">{{conta.nome}} :: Total R$ {{conta.saldo}}</span>
+        <span class="mt10">Total Entradas: {{totais.totalEntradas}}</span>
+        <span class="mt10">Total Saídas: {{totais.totalSaidas}}</span>
+        <span class="mt10">Saldo Inicial: {{totais.saldoInicial}}</span>
+        <span class="mt10">Saldo Final do Período: {{totais.saldoFinalPeriodo}}</span>
       </div>
 
       <div class="whitebox mt10">
         <div class="pageSubtitle">Movimentos</div>
+        <div class="">
+          <input name="filtroPorMes" class="form-input-inline form-input-sm" type="text" placeholder="filtroPorMes" v-model="filtroPorMes">
+          <button class="btn btn-sm" @click="buscaMovimentos()"><i class="fas fa-edit"></i> Buscar</button>
+        </div>
+
         <div class="whitebox max-width-800 mt10 flex-column font-size-small" v-for="movimento in movimentos" :key="movimento.id">
           <span class="mv5">
             {{ movimento.nomeLoja }} *** {{ movimento.descricao }}
@@ -126,6 +135,14 @@ export default {
       movimentos: [],
       exibirModalEdicao: false,
       movimentoEditar: {},
+
+      filtroPorMes: '',
+      totais: {
+        totalEntradas: 0,
+        totalSaidas: 0,
+        saldoInicial: 0,
+        saldoFinalPeriodo: 0
+      }
     }
   },
   methods: {
@@ -157,7 +174,10 @@ export default {
       this.busy = true;
       let url = 'http://localhost:8000/movimentos?idConta='+this.idConta;
       if(this.buscarMovimentoOrdemDecrescente == true) {
-        url += `&data=desc`
+        url += `&order-data=desc`
+      }
+      if(this.filtroPorMes !== '') {
+        url += `&mes=${this.filtroPorMes}`
       }
       let data = {
         method: 'get'
@@ -168,6 +188,7 @@ export default {
         console.log('[LOG]',response);
         console.log('[LOG]',data);
         this.movimentos = this.processaMovimentos(data.movimentos);
+        this.totais = this.processaTotais(data.totais);
         this.busy = false;
         notify.notify('carregado!', "success");
       })
@@ -180,10 +201,21 @@ export default {
         let ano = data.getFullYear()
         movimento.dataExibicao =  `${dia}/${mes}/${ano}`
         movimento.valor = movimento.valor.replace('.',',');
-        
+
+        for (let j = 0; j < movimento.itensMovimentos.length; j++) {
+          movimento.itensMovimentos[j].valor = movimento.itensMovimentos[j].valor.replace('.',',');
+        }
+
         movimento.data = movimento.data.date.substr(0, 10);
       });
       return movimentos;
+    },
+    processaTotais(totais){
+      totais.totalEntradas = totais.totalEntradas.toString().replace('.',',');
+      totais.totalSaidas = totais.totalSaidas.toString().replace('.',',');
+      totais.saldoInicial = totais.saldoInicial.toString().replace('.',',');
+      totais.saldoFinalPeriodo = totais.saldoFinalPeriodo.toString().replace('.',',');
+      return totais;
     },
     adicionarItemMovimento(){
       //defino o novo id

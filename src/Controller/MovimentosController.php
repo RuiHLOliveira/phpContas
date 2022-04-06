@@ -18,6 +18,28 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class MovimentosController extends AbstractController
 {
+
+    private function totalizaMovimentosParaExibicao($movimentos) {
+        $saldoInicial = 0;
+        $saldoFinalPeriodo = 0;
+        $totalEntradas = 0;
+        $totalSaidas = 0; //já em negativo
+        foreach ($movimentos as $key => $movimento) {
+            if($movimento->getValor() > 0) {
+                $totalEntradas += $movimento->getValor();
+            } elseif($movimento->getValor() < 0){
+                $totalSaidas += $movimento->getValor(); //já em negativo
+            }
+        }
+        // $saldoInicial = $saldoConta - $totalEntradas + $totalSaidas; 
+        $saldoFinalPeriodo = $saldoInicial + $totalEntradas + $totalSaidas;
+        $saldoInicial = number_format($saldoInicial,2);
+        $saldoFinalPeriodo = number_format($saldoFinalPeriodo,2);
+        $totalEntradas = number_format($totalEntradas,2);
+        $totalSaidas = number_format($totalSaidas,2);
+        return compact('totalEntradas','totalSaidas','saldoInicial','saldoFinalPeriodo');
+    }
+
     /**
      * @Route("/movimentos", methods={"GET","HEAD"})
      */
@@ -28,7 +50,7 @@ class MovimentosController extends AbstractController
             $orderby['data'] = 'asc';
 
             //PROCESSA ORDERBY
-            $data = $request->get('data');
+            $data = $request->get('order-data');
             if($data != null && ($data == 'asc' || $data == 'desc')) {
                 $orderby['data'] = $data;
             }
@@ -44,11 +66,23 @@ class MovimentosController extends AbstractController
             }
 
             $movimentos = $this->getDoctrine()->getRepository(Movimento::class)->findBy($filtros, $orderby);
+
+            // PROCESSA FILTRO DE MÊS
+            $mes = $request->get('mes');
+            if($mes != null && $mes != '') {
+                $movimentosFiltrados = array_filter($movimentos, function($movimento) use ($mes) {
+                    $data = $movimento->getData()->format('Y-m-d');
+                    return strpos($data,$mes) !== false;
+                });
+                $movimentos = array_values($movimentosFiltrados);
+            }
+
+            $totais = $this->totalizaMovimentosParaExibicao($movimentos);
             foreach ($movimentos as $key => $value) {
                 $movimentos[$key]->serializarItensMovimentos();
             }
 
-            return new JsonResponse(compact('movimentos'),200);
+            return new JsonResponse(compact('movimentos','totais'),200);
 
         } catch (ValidationException $e) {
             return new JsonResponse(['message' => $e->getMessage()], 400);
@@ -208,23 +242,45 @@ class MovimentosController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($movimento);
 
-            foreach ($requestData->itensMovimentos as $key => $itemMovimento) {
+            $itensMovimentosAntigos = $this->getDoctrine()
+            ->getRepository(ItemMovimento::class)
+            ->findBy([
+                'movimento' => $movimento
+            ]);
 
-                $itemMovimentoObj = $this->getDoctrine()
-                ->getRepository(ItemMovimento::class)
-                ->findOneBy([
-                    'id' => $itemMovimento->id
-                ]);
-
-                if($itemMovimentoObj == null) {
-                    throw new NotFoundHttpException('Item Movimento não encontrada.');
+            foreach ($itensMovimentosAntigos as $key => $itemMovimentoAntigo) {
+                //localizar o item antigo no array de itens recebidos
+                $itemMovimentoRecebido = array_filter($requestData->itensMovimentos, function($itemMovimentoRecebido) use ($itemMovimentoAntigo) {
+                    return $itemMovimentoRecebido->id == $itemMovimentoAntigo->getId();
+                });
+                $itemMovimentoRecebido = array_values($itemMovimentoRecebido);
+                if(count($itemMovimentoRecebido) > 0) {
+                    $itemMovimentoRecebido = $itemMovimentoRecebido[0];
+                    //se localizar, atualiza
+                    $valor = str_replace(',','.', $itemMovimentoRecebido->valor);
+                    $itemMovimentoAntigo->setValor($valor);
+                    $itemMovimentoAntigo->setNome($itemMovimentoRecebido->nome);
+                    $em->persist($itemMovimentoAntigo);
+                } else {
+                    //se não, deleta
+                    $em->remove($itemMovimentoAntigo);
                 }
+            }
 
-                $valor = str_replace(',','.', $itemMovimento->valor);
-
-                $itemMovimentoObj->setValor($valor);
-                $itemMovimentoObj->setNome($itemMovimento->nome);
-                $em->persist($itemMovimentoObj);
+            foreach ($requestData->itensMovimentos as $key => $itemMovimentoNovo) {
+                //localizar o item novo no array dos antigos, se não encontrar, inserir
+                $encontrados = array_filter($itensMovimentosAntigos, function($itemMovimentoAntigo) use ($itemMovimentoNovo) {
+                    return $itemMovimentoNovo->id == $itemMovimentoAntigo->getId();
+                });
+                if(empty($encontrados)){
+                    //insere
+                    $valor = str_replace(',','.', $itemMovimentoNovo->valor);
+                    $itemMovimentoObj = new ItemMovimento();
+                    $itemMovimentoObj->setMovimento($movimento);
+                    $itemMovimentoObj->setValor($valor);
+                    $itemMovimentoObj->setNome($itemMovimentoNovo->nome);
+                    $em->persist($itemMovimentoObj);
+                }
             }
 
             $em->flush();
